@@ -1,0 +1,5 @@
+test_status	scenario_id	tin	npi	perf_year	category	sub_method	msr_set	perf_start	perf_end	measure_id	msr_type	end_to_end	stratum	perf_met	perf_exc	perf_not_met	pop_total	msr_score_value	msr_score_detail	perf_rate
+FAILED	scenario_1	200000	2000002	2017	quality	registry		1/1/2017	6/1/2017	7	multi	false	LVEF<40%	10000	0	0	10000	null	null	null
+FAILED	scenario_1	200000	2000002	2017	quality	registry		1/1/2017	6/1/2017	7	multi	false	myocardialInfarction	2	5	6	88	10	Class I Measure	100
+FAILED	scenario_1	200000	2000002	2017	quality	registry		1/2/2017	6/2/2017	100	single	false								50
+FAILED	Sceanrio_2	200000	2000002	2017	quality	registry		1/1/2017	6/1/2017	102	single	false		5000	0	0	10000	10	Class I Measure	null
