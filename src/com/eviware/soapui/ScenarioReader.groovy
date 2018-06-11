@@ -1,7 +1,6 @@
 package com.eviware.soapui
 
 class ScenarioReader {
-
     static TEMPLATE_ENGINE = new groovy.text.SimpleTemplateEngine()
     static SNIPPETS = [:]
 
@@ -13,6 +12,7 @@ class ScenarioReader {
     private String line;
     private scenarioId = 'scenario_id';
     private measureId = 'measure_id';
+    private msetId = 'mset_id';
     public Map<String, List<Scenario>> scenarioMap = [:];
     public Iterator it;
     def propsStep;
@@ -47,6 +47,13 @@ class ScenarioReader {
         SNIPPETS.put('STRATUM', TEMPLATE_ENGINE.createTemplate(stratumSnippet));
     }
 
+    public void addMeasurementSetSnippet(String msetSnippet) {
+    	   SNIPPETS.put('MSET_TEMPLATE', TEMPLATE_ENGINE.createTemplate(msetSnippet));
+    }
+
+    public void addXSnippet(String name, String newSnippet) {
+        SNIPPETS.put(name, TEMPLATE_ENGINE.createTemplate(newSnippet));
+    }
 
     private void addScenario(Scenario s) {
         if (scenarioMap.containsKey(s.scenarioId)) {
@@ -75,22 +82,48 @@ class ScenarioReader {
         return new Scenario(this.header, data[scenarioId], data);
     }
 
-    public String toMeasurements(List<Scenario> list) {
+    public String toMeasurements(List<Scenario> list, String msetConstraint) {
         def measureList = [];
         list.each { s ->
-            if(s.children.size() > 0) {
-                def stratumList = [];
-                stratumList << s.eval(SNIPPETS['STRATUM'])
-                s.children.each { c->
-                    stratumList << c.eval(SNIPPETS['STRATUM'])
-                }
-                s.data.put('STRATUM', stratumList.join(','))
-                measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
-            } else {
-                measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
-            }
+        	  def measureCategory = s.data.get('category')
+        	  if (s.data.get('mset_id') != msetConstraint) { return; }
+        	  if (measureCategory == 'aci') {
+        	  	if (s.data.get('value') != '') {
+        	  		measureList << s.eval(SNIPPETS['ACI_MEASURE_TEMPLATE'])
+        	  	} else if (s.data.get('value_numerator') != '' && s.data.get('value_denominator') != '') {
+        	  		measureList << s.eval(SNIPPETS['ACI_ALT_MEASURE_TEMPLATE'])
+        	  	}
+        	  } else if (measureCategory == 'ia') {
+      	  	if (s.data.get('value') != '') {
+        	  		measureList << s.eval(SNIPPETS['ACI_MEASURE_TEMPLATE'])
+        	  	} else if (s.data.get('value_numerator') != '' && s.data.get('value_denominator') != '') {
+        	  		measureList << s.eval(SNIPPETS['ACI_ALT_MEASURE_TEMPLATE'])
+        	  	}
+        	  } else if (measureCategory == 'quality') {
+        	      if(s.children.size() > 0) {
+                	def stratumList = [];
+                	stratumList << s.eval(SNIPPETS['STRATUM'])
+                	s.children.each { c->
+                	    stratumList << c.eval(SNIPPETS['STRATUM'])
+                	}
+               	 s.data.put('STRATUM', stratumList.join(','))
+                	measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
+           	 } else {
+              	  measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
+            	 }
+        	  }
         }
         return measureList.join(',');
+    }
+
+    public String toMeasurementSets(List<Scenario> list) {
+    	def Set msetList = [];
+    	list.each { s ->
+		def msetName = s.data.get('mset_id')
+		s.data.put('MEASUREMENTS', '${MEASUREMENTS_' + msetName + '}' )
+		msetList << s.eval(SNIPPETS['MSET_TEMPLATE'])
+    	}
+    	return msetList.join(',');
     }
 
     public String copyScenarioProperties(def propsStep, List<Scenario> scenarios) {
@@ -99,7 +132,16 @@ class ScenarioReader {
             last.getProperties().each {k,v ->
                 propsStep.setPropertyValue(k, v);
             }
-            propsStep.setPropertyValue('MEASUREMENTS', this.toMeasurements(scenarios))
+            propsStep.setPropertyValue('MSETS', this.toMeasurementSets(scenarios))
+
+            def Set mSetsMeasurementProps = [];
+            scenarios.each { s ->
+            	mSetsMeasurementProps << ['MEASUREMENTS_' + s.data.get('mset_id'), s.data.get('mset_id')]
+            }
+            mSetsMeasurementProps.each { measurementProp ->
+            	propsStep.setPropertyValue(measurementProp[0], this.toMeasurements(scenarios, measurementProp[1]))
+            }
+            
         }
     }
 
