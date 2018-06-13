@@ -35,6 +35,10 @@ class ScenarioReader {
         this.it = this.scenarioMap.iterator();
     }
 
+    public boolean isEmptyOrNull(x) {
+        return (x == '' || x == null)
+    }
+
     public void setPropsStep(def props) {
         this.propsStep = props;
     }
@@ -94,14 +98,14 @@ class ScenarioReader {
         	  		measureList << s.eval(SNIPPETS['ACI_ALT_MEASURE_TEMPLATE'])
         	  	}
         	  } else if (measureCategory == 'ia') {
-      	  	if (s.data.get('value') != '') {
+      	  	if (!this.isEmptyOrNull(s.data.get('value'))) {
         	  		measureList << s.eval(SNIPPETS['ACI_MEASURE_TEMPLATE'])
-        	  	} else if (s.data.get('value_numerator') != '' && s.data.get('value_denominator') != '') {
+        	  	} else if (!this.isEmptyOrNull(s.data.get('value_numerator')) && !this.isEmptyOrNull(s.data.get('value_denominator'))) {
         	  		measureList << s.eval(SNIPPETS['ACI_ALT_MEASURE_TEMPLATE'])
         	  	}
         	  } else if (measureCategory == 'quality') {
         	      if(s.children.size() > 0) {
-        	      	if (s.data.get('indexAdmissionCode') != '' && s.data.get('readmissionCode') != '' && s.data.get('code') != '') {
+        	      	if (!this.isEmptyOrNull(s.data.get('indexAdmissionCode')) && !this.isEmptyOrNull(s.data.get('readmissionCode')) && !this.isEmptyOrNull(s.data.get('code'))) {
         	      		def Set acrList = [];
         	      		def Set indexAdmissionCodes = [];
         	      		def Set readmissionCodes = [];
@@ -124,7 +128,11 @@ class ScenarioReader {
                 		measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
         	      	}
            	 } else {
-              	  measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
+           	 	if (!this.isEmptyOrNull(s.data.get('cahps_reliability')) && !this.isEmptyOrNull(s.data.get('cahps_mask')) && !this.isEmptyOrNull(s.data.get('cahps_isBelowMinimum'))) {
+        	      		measureList << s.eval(SNIPPETS['CAHPS_MEASURE_TPL'])
+        	      	} else {
+              	 		measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
+        	      	}
             	 }
         	  }
         }
