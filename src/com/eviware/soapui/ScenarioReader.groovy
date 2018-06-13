@@ -32,6 +32,8 @@ class ScenarioReader {
     	   this.addXSnippet('ACR_Readd_COUNTS', '{"code":"${readmissionCode}","count":${count}}')
     	   this.addXSnippet('ACR_MEASURE', '{"measureId":"${measure_id}","value":{"score":${score},"details":{"numberOfIndexAdmissions":${numberOfIndexAdmissions},"numberOfReadmissions":${numberOfReadmissions},"indexReadmissionDiagnosisPairCounts":[${IDX_READD_PAIR_COUNTS}],"indexAdmissionCountByDiagnosis":[${idxAdminCodes}],"readmissionCountByDiagnosis":[${readdCodes}],"plannedReadmissions":${plannedReadmissions}}}}')
     	   this.addXSnippet('CAHPS_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"score":${score},"reliability":"${cahps_reliability}","mask":${cahps_mask},"isBelowMinimum":${cahps_isBelowMinimum}}}')
+         this.addXSnippet('PROP_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"performanceRate":${performanceRate},"eligiblePopulation":${pop_total}}}')
+         this.addXSnippet('PROP_MULTI_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceRate":${performanceRate},"strata":[${STRATUM}]}}')
     }
 
     public ScenarioReader(String folder, String inputFileName, String outputFileName, log) {
@@ -143,13 +145,19 @@ class ScenarioReader {
                 	 	   stratumList << c.eval(SNIPPETS['STRATUM'])
                 		}
                		 s.data.put('STRATUM', stratumList.join(','))
-                		measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
+                    if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
+                      measureList << s.eval(SNIPPETS['PROP_MULTI_MEASURE_TPL'])
+                    } else {
+                      measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
+                    }
         	      	}
            	 } else {
            	 	if (!this.isEmptyOrNull(s.data.get('cahps_reliability')) && !this.isEmptyOrNull(s.data.get('cahps_mask')) && !this.isEmptyOrNull(s.data.get('cahps_isBelowMinimum'))) {
         	      		measureList << s.eval(SNIPPETS['CAHPS_MEASURE_TPL'])
         	      	} else if (!this.isEmptyOrNull(s.data.get('isEndToEndReported')) && !this.isEmptyOrNull(s.data.get('numerator')) && !this.isEmptyOrNull(s.data.get('denominator')) && !this.isEmptyOrNull(s.data.get('denominator_exc')) && !this.isEmptyOrNull(s.data.get('numerator_exc'))) {
         	      		measureList << s.eval(SNIPPETS['NONPROP_MEASURE_TPL'])
+        	      	} else if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
+                    measureList << s.eval(SNIPPETS['PROP_MEASURE_TPL'])
         	      	} else {
               	 		measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
         	      	}
