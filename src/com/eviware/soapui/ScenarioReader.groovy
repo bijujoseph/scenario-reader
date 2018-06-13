@@ -18,7 +18,25 @@ class ScenarioReader {
     def propsStep;
     List<Scenario> currentScenarioList;
 
+    public void cfgSnippets() {
+    	   this.addXSnippet('MSET_TEMPLATE', ' {"programName": "mips","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
+    	   this.addXSnippet('NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc}}}')
+    	   this.addXSnippet('SINGLE_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total}}}')
+    	   this.addXSnippet('MULTI_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"strata":[${STRATUM}]}}')
+    	   this.addXSnippet('STRATUM', '{"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total},"stratum":"${stratum}"}')
+    	   this.addXSnippet('ACI_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":${value}}')
+    	   this.addXSnippet('ACI_ALT_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":{"numerator":${value_numerator},"denominator":${value_denominator}}}')
+    	   this.addXSnippet('IDX_READD_PAIR_COUNTS', '{"indexAdmissionCode":"${indexAdmissionCode}","readmissionCode":"${readmissionCode}","count":${count}}')
+    	   this.addXSnippet('ACR_Idx_COUNTS', '{"code":"${indexAdmissionCode}","count":${count}}')
+    	   this.addXSnippet('ACR_Readd_COUNTS', '{"code":"${readmissionCode}","count":${count}}')
+    	   this.addXSnippet('ACR_MEASURE', '{"measureId":"${measure_id}","value":{"score":${score},"details":{"numberOfIndexAdmissions":${numberOfIndexAdmissions},"numberOfReadmissions":${numberOfReadmissions},"indexReadmissionDiagnosisPairCounts":[${IDX_READD_PAIR_COUNTS}],"indexAdmissionCountByDiagnosis":[${idxAdminCodes}],"readmissionCountByDiagnosis":[${readdCodes}],"plannedReadmissions":${plannedReadmissions}}}}')
+    	   this.addXSnippet('CAHPS_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"score":${score},"reliability":"${cahps_reliability}","mask":${cahps_mask},"isBelowMinimum":${cahps_isBelowMinimum}}}')
+         this.addXSnippet('PROP_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"performanceRate":${performanceRate},"eligiblePopulation":${pop_total}}}')
+         this.addXSnippet('PROP_MULTI_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceRate":${performanceRate},"strata":[${STRATUM}]}}')
+    }
+
     public ScenarioReader(String folder, String inputFileName, String outputFileName) {
+    	  this.cfgSnippets()
         this.inputFile = new File(folder, inputFileName);
         this.outputFile = new File(folder, outputFileName);
         inputFile.eachLine {line, i ->
@@ -33,6 +51,10 @@ class ScenarioReader {
         this.outputFile.delete();
         this.outputFile << "test_status\t${this.header.join('\t')}\n"
         this.it = this.scenarioMap.iterator();
+    }
+
+    public boolean isEmptyOrNull(x) {
+        return (x == '' || x == null)
     }
 
     public void setPropsStep(def props) {
@@ -94,22 +116,49 @@ class ScenarioReader {
         	  		measureList << s.eval(SNIPPETS['ACI_ALT_MEASURE_TEMPLATE'])
         	  	}
         	  } else if (measureCategory == 'ia') {
-      	  	if (s.data.get('value') != '') {
+      	  	if (!this.isEmptyOrNull(s.data.get('value'))) {
         	  		measureList << s.eval(SNIPPETS['ACI_MEASURE_TEMPLATE'])
-        	  	} else if (s.data.get('value_numerator') != '' && s.data.get('value_denominator') != '') {
+        	  	} else if (!this.isEmptyOrNull(s.data.get('value_numerator')) && !this.isEmptyOrNull(s.data.get('value_denominator'))) {
         	  		measureList << s.eval(SNIPPETS['ACI_ALT_MEASURE_TEMPLATE'])
         	  	}
         	  } else if (measureCategory == 'quality') {
         	      if(s.children.size() > 0) {
-                	def stratumList = [];
-                	stratumList << s.eval(SNIPPETS['STRATUM'])
-                	s.children.each { c->
-                	    stratumList << c.eval(SNIPPETS['STRATUM'])
-                	}
-               	 s.data.put('STRATUM', stratumList.join(','))
-                	measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
+        	      	if (!this.isEmptyOrNull(s.data.get('indexAdmissionCode')) && !this.isEmptyOrNull(s.data.get('readmissionCode')) && !this.isEmptyOrNull(s.data.get('score'))) {
+        	      		def Set acrList = [];
+        	      		def Set indexAdmissionCodes = [];
+        	      		def Set readmissionCodes = [];
+        	      		s.children.each { c->
+        	      			acrList << s.eval(SNIPPETS['IDX_READD_PAIR_COUNTS']);
+        	      			indexAdmissionCodes << s.eval(SNIPPETS['ACR_Idx_COUNTS']);
+        	      			readmissionCodes << s.eval(SNIPPETS['ACR_Readd_COUNTS']);
+        	      		}
+        	      		s.data.put('IDX_READD_PAIR_COUNTS', acrList.join(','))
+        	      		s.data.put('idxAdminCodes', indexAdmissionCodes.join(','))
+        	      		s.data.put('readdCodes', readmissionCodes.join(','))
+        	      		measureList << s.eval(SNIPPETS['ACR_MEASURE'])
+        	      	} else {
+                		def stratumList = [];
+                		stratumList << s.eval(SNIPPETS['STRATUM'])
+                		s.children.each { c->
+                	 	   stratumList << c.eval(SNIPPETS['STRATUM'])
+                		}
+               		 s.data.put('STRATUM', stratumList.join(','))
+                    if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
+                      measureList << s.eval(SNIPPETS['PROP_MULTI_MEASURE_TPL'])
+                    } else {
+                      measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
+                    }
+        	      	}
            	 } else {
-              	  measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
+           	 	if (!this.isEmptyOrNull(s.data.get('cahps_reliability')) && !this.isEmptyOrNull(s.data.get('cahps_mask')) && !this.isEmptyOrNull(s.data.get('cahps_isBelowMinimum'))) {
+        	      		measureList << s.eval(SNIPPETS['CAHPS_MEASURE_TPL'])
+        	      	} else if (!this.isEmptyOrNull(s.data.get('end_to_end')) && !this.isEmptyOrNull(s.data.get('numerator')) && !this.isEmptyOrNull(s.data.get('denominator')) && !this.isEmptyOrNull(s.data.get('denominator_exc')) && !this.isEmptyOrNull(s.data.get('numerator_exc'))) {
+        	      		measureList << s.eval(SNIPPETS['NONPROP_MEASURE_TPL'])
+        	      	} else if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
+                    measureList << s.eval(SNIPPETS['PROP_MEASURE_TPL'])
+        	      	} else {
+              	 		measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
+        	      	}
             	 }
         	  }
         }
