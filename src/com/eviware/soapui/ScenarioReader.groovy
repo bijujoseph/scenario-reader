@@ -1,29 +1,5 @@
 package com.eviware.soapui
 
-def groovyUtils=new  com.eviware.soapui.support.GroovyUtils(context)
-def projectPath = groovyUtils.projectPath
-def testCase = testRunner.testCase;
-
-def props = testRunner.testCase.testSteps["props"];
-
-def SINGLE_MEASURE_TEMPLATE = testCase.getPropertyValue("single_measure_tpl")
-def MULTI_MEASURE_TEMPLATE = testCase.getPropertyValue("multi_measure_tpl")
-def STRATUM_TEMPLATE = testCase.getPropertyValue("stratum_tpl")
-def MSET_TEMPLATE = testCase.getPropertyValue("mset_tpl")
-def ACR_MEASURE_TPL = testCase.getPropertyValue("ACR_MEASURE_TPL")
-def ACR_MEASURE_PAIR_TPL = testCase.getPropertyValue("ACR_MEASURE_PAIR_TPL")
-def ACR_IDX_MEASURE_TPL = testCase.getPropertyValue("ACR_IDX_MEASURE_TPL")
-def ACR_READD_MEASURE_TPL = testCase.getPropertyValue("ACR_READD_MEASURE_TPL")
-
-if (System.properties['os.name'].toLowerCase().contains('windows')) {
-	inputFileName = testCase.getPropertyValue("input_file").replace("/", "\\")
-	outputFileName = testCase.getPropertyValue("output_file").replace("/", "\\")
-} else { 
-	inputFileName = testCase.getPropertyValue("input_file").replace("\\", "/")
-	outputFileName = testCase.getPropertyValue("output_file").replace("\\", "/")
-}
-def projectFolder = new File(projectPath)
-
 class ScenarioReader {
     static TEMPLATE_ENGINE = new groovy.text.SimpleTemplateEngine()
     static SNIPPETS = [:]
