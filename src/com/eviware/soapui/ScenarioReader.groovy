@@ -1,6 +1,7 @@
 package com.eviware.soapui
 
 class ScenarioReader {
+	def log
     static TEMPLATE_ENGINE = new groovy.text.SimpleTemplateEngine()
     static SNIPPETS = [:]
 
@@ -18,7 +19,24 @@ class ScenarioReader {
     def propsStep;
     List<Scenario> currentScenarioList;
 
-    public ScenarioReader(String folder, String inputFileName, String outputFileName) {
+    public void cfgSnippets() {
+    	   this.addXSnippet('MSET_TEMPLATE', ' {"programName": "mips","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
+    	   this.addXSnippet('NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc}}}')
+    	   this.addXSnippet('SINGLE_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total}}}')
+    	   this.addXSnippet('MULTI_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"strata":[${STRATUM}]}}')
+    	   this.addXSnippet('STRATUM', '{"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total},"stratum":"${stratum}"}')
+    	   this.addXSnippet('ACI_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":${value}}')
+    	   this.addXSnippet('ACI_ALT_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":{"numerator":${value_numerator},"denominator":${value_denominator}}}')
+    	   this.addXSnippet('IDX_READD_PAIR_COUNTS', '{"indexAdmissionCode":"${indexAdmissionCode}","readmissionCode":"${readmissionCode}","count":${count}}')
+    	   this.addXSnippet('ACR_Idx_COUNTS', '{"code":"${indexAdmissionCode}","count":${count}}')
+    	   this.addXSnippet('ACR_Readd_COUNTS', '{"code":"${readmissionCode}","count":${count}}')
+    	   this.addXSnippet('ACR_MEASURE', '{"measureId":"${measure_id}","value":{"score":${score},"details":{"numberOfIndexAdmissions":${numberOfIndexAdmissions},"numberOfReadmissions":${numberOfReadmissions},"indexReadmissionDiagnosisPairCounts":[${IDX_READD_PAIR_COUNTS}],"indexAdmissionCountByDiagnosis":[${idxAdminCodes}],"readmissionCountByDiagnosis":[${readdCodes}],"plannedReadmissions":${plannedReadmissions}}}}')
+    	   this.addXSnippet('CAHPS_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"score":${score},"reliability":"${cahps_reliability}","mask":${cahps_mask},"isBelowMinimum":${cahps_isBelowMinimum}}}')
+    }
+
+    public ScenarioReader(String folder, String inputFileName, String outputFileName, log) {
+    	this.log = log
+    	   this.cfgSnippets()
         this.inputFile = new File(folder, inputFileName);
         this.outputFile = new File(folder, outputFileName);
         inputFile.eachLine {line, i ->
@@ -105,7 +123,7 @@ class ScenarioReader {
         	  	}
         	  } else if (measureCategory == 'quality') {
         	      if(s.children.size() > 0) {
-        	      	if (!this.isEmptyOrNull(s.data.get('indexAdmissionCode')) && !this.isEmptyOrNull(s.data.get('readmissionCode')) && !this.isEmptyOrNull(s.data.get('code'))) {
+        	      	if (!this.isEmptyOrNull(s.data.get('indexAdmissionCode')) && !this.isEmptyOrNull(s.data.get('readmissionCode')) && !this.isEmptyOrNull(s.data.get('score'))) {
         	      		def Set acrList = [];
         	      		def Set indexAdmissionCodes = [];
         	      		def Set readmissionCodes = [];
