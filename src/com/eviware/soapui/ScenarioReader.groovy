@@ -1,7 +1,6 @@
 package com.eviware.soapui
 
 class ScenarioReader {
-	def log
     static TEMPLATE_ENGINE = new groovy.text.SimpleTemplateEngine()
     static SNIPPETS = [:]
 
@@ -36,9 +35,8 @@ class ScenarioReader {
          this.addXSnippet('PROP_MULTI_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceRate":${performanceRate},"strata":[${STRATUM}]}}')
     }
 
-    public ScenarioReader(String folder, String inputFileName, String outputFileName, log) {
-    	this.log = log
-    	   this.cfgSnippets()
+    public ScenarioReader(String folder, String inputFileName, String outputFileName) {
+    	  this.cfgSnippets()
         this.inputFile = new File(folder, inputFileName);
         this.outputFile = new File(folder, outputFileName);
         inputFile.eachLine {line, i ->
@@ -154,7 +152,7 @@ class ScenarioReader {
            	 } else {
            	 	if (!this.isEmptyOrNull(s.data.get('cahps_reliability')) && !this.isEmptyOrNull(s.data.get('cahps_mask')) && !this.isEmptyOrNull(s.data.get('cahps_isBelowMinimum'))) {
         	      		measureList << s.eval(SNIPPETS['CAHPS_MEASURE_TPL'])
-        	      	} else if (!this.isEmptyOrNull(s.data.get('isEndToEndReported')) && !this.isEmptyOrNull(s.data.get('numerator')) && !this.isEmptyOrNull(s.data.get('denominator')) && !this.isEmptyOrNull(s.data.get('denominator_exc')) && !this.isEmptyOrNull(s.data.get('numerator_exc'))) {
+        	      	} else if (!this.isEmptyOrNull(s.data.get('end_to_end')) && !this.isEmptyOrNull(s.data.get('numerator')) && !this.isEmptyOrNull(s.data.get('denominator')) && !this.isEmptyOrNull(s.data.get('denominator_exc')) && !this.isEmptyOrNull(s.data.get('numerator_exc'))) {
         	      		measureList << s.eval(SNIPPETS['NONPROP_MEASURE_TPL'])
         	      	} else if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
                     measureList << s.eval(SNIPPETS['PROP_MEASURE_TPL'])
