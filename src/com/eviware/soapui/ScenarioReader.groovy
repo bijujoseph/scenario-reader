@@ -130,6 +130,8 @@ class ScenarioReader {
            	 } else {
            	 	if (!this.isEmptyOrNull(s.data.get('cahps_reliability')) && !this.isEmptyOrNull(s.data.get('cahps_mask')) && !this.isEmptyOrNull(s.data.get('cahps_isBelowMinimum'))) {
         	      		measureList << s.eval(SNIPPETS['CAHPS_MEASURE_TPL'])
+        	      	} else if (!this.isEmptyOrNull(s.data.get('isEndToEndReported')) && !this.isEmptyOrNull(s.data.get('numerator')) && !this.isEmptyOrNull(s.data.get('denominator')) && !this.isEmptyOrNull(s.data.get('denominator_exc')) && !this.isEmptyOrNull(s.data.get('numerator_exc'))) {
+        	      		measureList << s.eval(SNIPPETS['NONPROP_MEASURE_TPL'])
         	      	} else {
               	 		measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
         	      	}
