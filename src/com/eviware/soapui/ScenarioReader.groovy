@@ -1,5 +1,29 @@
 package com.eviware.soapui
 
+def groovyUtils=new  com.eviware.soapui.support.GroovyUtils(context)
+def projectPath = groovyUtils.projectPath
+def testCase = testRunner.testCase;
+
+def props = testRunner.testCase.testSteps["props"];
+
+def SINGLE_MEASURE_TEMPLATE = testCase.getPropertyValue("single_measure_tpl")
+def MULTI_MEASURE_TEMPLATE = testCase.getPropertyValue("multi_measure_tpl")
+def STRATUM_TEMPLATE = testCase.getPropertyValue("stratum_tpl")
+def MSET_TEMPLATE = testCase.getPropertyValue("mset_tpl")
+def ACR_MEASURE_TPL = testCase.getPropertyValue("ACR_MEASURE_TPL")
+def ACR_MEASURE_PAIR_TPL = testCase.getPropertyValue("ACR_MEASURE_PAIR_TPL")
+def ACR_IDX_MEASURE_TPL = testCase.getPropertyValue("ACR_IDX_MEASURE_TPL")
+def ACR_READD_MEASURE_TPL = testCase.getPropertyValue("ACR_READD_MEASURE_TPL")
+
+if (System.properties['os.name'].toLowerCase().contains('windows')) {
+	inputFileName = testCase.getPropertyValue("input_file").replace("/", "\\")
+	outputFileName = testCase.getPropertyValue("output_file").replace("/", "\\")
+} else { 
+	inputFileName = testCase.getPropertyValue("input_file").replace("\\", "/")
+	outputFileName = testCase.getPropertyValue("output_file").replace("\\", "/")
+}
+def projectFolder = new File(projectPath)
+
 class ScenarioReader {
     static TEMPLATE_ENGINE = new groovy.text.SimpleTemplateEngine()
     static SNIPPETS = [:]
@@ -101,13 +125,28 @@ class ScenarioReader {
         	  	}
         	  } else if (measureCategory == 'quality') {
         	      if(s.children.size() > 0) {
-                	def stratumList = [];
-                	stratumList << s.eval(SNIPPETS['STRATUM'])
-                	s.children.each { c->
-                	    stratumList << c.eval(SNIPPETS['STRATUM'])
-                	}
-               	 s.data.put('STRATUM', stratumList.join(','))
-                	measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
+        	      	if (s.data.get('indexAdmissionCode') != '' && s.data.get('readmissionCode') != '' && s.data.get('code') != '') {
+        	      		def Set acrList = [];
+        	      		def Set indexAdmissionCodes = [];
+        	      		def Set readmissionCodes = [];
+        	      		s.children.each { c->
+        	      			acrList << s.eval(SNIPPETS['IDX_READD_PAIR_COUNTS']);
+        	      			indexAdmissionCodes << s.eval(SNIPPETS['ACR_Idx_COUNTS']);
+        	      			readmissionCodes << s.eval(SNIPPETS['ACR_Readd_COUNTS']);
+        	      		}
+        	      		s.data.put('IDX_READD_PAIR_COUNTS', acrList.join(','))
+        	      		s.data.put('idxAdminCodes', indexAdmissionCodes.join(','))
+        	      		s.data.put('readdCodes', readmissionCodes.join(','))
+        	      		measureList << s.eval(SNIPPETS['ACR_MEASURE'])
+        	      	} else {
+                		def stratumList = [];
+                		stratumList << s.eval(SNIPPETS['STRATUM'])
+                		s.children.each { c->
+                	 	   stratumList << c.eval(SNIPPETS['STRATUM'])
+                		}
+               		 s.data.put('STRATUM', stratumList.join(','))
+                		measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
+        	      	}
            	 } else {
               	  measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
             	 }
