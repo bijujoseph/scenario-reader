@@ -55,6 +55,7 @@ class ScenarioReader {
     this.addXSnippet('CAHPS_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"score":${score},"reliability":"${cahps_reliability}","mask":${cahps_mask},"isBelowMinimum":${cahps_isBelowMinimum}}}')
     this.addXSnippet('PROP_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"performanceRate":${performanceRate},"eligiblePopulation":${pop_total}}}')
     this.addXSnippet('PROP_MULTI_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceRate":${performanceRate},"strata":[${STRATUM}]}}')
+    this.addXSnippet('COST_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":{"score":${score},"details":{"ratio":${ratio},"eligibleOccurrences":${eligibleOccurrences},"costPerOccurrence":${costPerOccurrence}}}}')
   }
 
 // ScenarioReader -- Class used to initialize all necessary files 
@@ -218,6 +219,10 @@ class ScenarioReader {
           } else {
             measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
           }
+        }
+      } else if (measureCategory == 'cost') {
+        if (!this.isEmptyOrNull(s.data.get('score')) && !this.isEmptyOrNull(s.data.get('ratio')) && !this.isEmptyOrNull(s.data.get('eligibleOccurrences')) && !this.isEmptyOrNull(s.data.get('costPerOccurrence'))) {
+          measureList << s.eval(SNIPPETS['COST_MEASURE_TEMPLATE'])
         }
       }
       // End Quality Measurement Creation
