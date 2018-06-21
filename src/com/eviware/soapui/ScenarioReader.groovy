@@ -216,11 +216,13 @@ class ScenarioReader {
           } else if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
             measureList << s.eval(SNIPPETS['PROP_MEASURE_TPL'])
           // Standard Single Measure
-          } else if (!this.isEmptyOrNull(s.data.get('score')) && this.isEmptyOrNull(s.data.get('ratio')) && this.isEmptyOrNull(s.data.get('eligibleOccurrences')) && this.isEmptyOrNull(s.data.get('costPerOccurrence'))) {
-            measureList << s.eval(SNIPPETS['COST_MEASURE_TEMPLATE'])
           } else {
             measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
           }
+        }
+      } else if (measureCategory == 'cost') {
+        if (!this.isEmptyOrNull(s.data.get('score')) && !this.isEmptyOrNull(s.data.get('ratio')) && !this.isEmptyOrNull(s.data.get('eligibleOccurrences')) && !this.isEmptyOrNull(s.data.get('costPerOccurrence'))) {
+          measureList << s.eval(SNIPPETS['COST_MEASURE_TEMPLATE'])
         }
       }
       // End Quality Measurement Creation
