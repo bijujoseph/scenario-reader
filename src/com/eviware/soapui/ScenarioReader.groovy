@@ -157,7 +157,7 @@ class ScenarioReader {
       def measureCategory = s.data.get('category')
       if (s.data.get('mset_id') != msetConstraint) { return; }
       // Begin ACI Measurement Creation
-      if (measureCategory == 'aci') {
+      if (measureCategory == 'aci' || measureCategory == 'pi') {
         if (s.data.get('value') != '') {
           measureList << s.eval(SNIPPETS['ACI_MEASURE_TEMPLATE'])
         } else if (s.data.get('value_numerator') != '' && s.data.get('value_denominator') != '') {
@@ -278,3 +278,4 @@ class ScenarioReader {
     copyScenarioProperties(this.propsStep, this.currentScenarioList)
   }
 }
+
