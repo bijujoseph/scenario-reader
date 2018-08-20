@@ -155,7 +155,6 @@ class ScenarioReader {
     def measureList = [];
     list.each { s ->
       def measureCategory = s.data.get('category')
-      def perfYear = s.data.get('perf_year')
       if (s.data.get('mset_id') != msetConstraint) { return; }
       // Begin ACI Measurement Creation
       if (measureCategory == 'aci' || measureCategory == 'pi') {
@@ -189,7 +188,7 @@ class ScenarioReader {
             s.data.put('IDX_READD_PAIR_COUNTS', acrList.join(','))
             s.data.put('idxAdminCodes', indexAdmissionCodes.join(','))
             s.data.put('readdCodes', readmissionCodes.join(','))
-            measureList << SNIPPETS['ACR_MEASURE'])
+            measureList << s.eval(SNIPPETS['ACR_MEASURE'])
           } else {
             // Stratum Measures
             def stratumList = [];
@@ -200,25 +199,25 @@ class ScenarioReader {
             s.data.put('STRATUM', stratumList.join(','))
             // Proportional Stratum Measures
             if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
-              measureList << SNIPPETS['PROP_MULTI_MEASURE_TPL'])
+              measureList << s.eval(SNIPPETS['PROP_MULTI_MEASURE_TPL'])
             // Stratum Measures
             } else {
-              measureList << SNIPPETS['MULTI_MEASURE'])
+              measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
             }
           }
         } else {
           // CAHPS Measure
           if (!this.isEmptyOrNull(s.data.get('cahps_reliability')) && !this.isEmptyOrNull(s.data.get('cahps_mask')) && !this.isEmptyOrNull(s.data.get('cahps_isBelowMinimum'))) {
-            measureList << SNIPPETS['CAHPS_MEASURE_TPL'])
+            measureList << s.eval(SNIPPETS['CAHPS_MEASURE_TPL'])
           // NonProportional Measure
           } else if (!this.isEmptyOrNull(s.data.get('end_to_end')) && !this.isEmptyOrNull(s.data.get('numerator')) && !this.isEmptyOrNull(s.data.get('denominator')) && !this.isEmptyOrNull(s.data.get('denominator_exc')) && !this.isEmptyOrNull(s.data.get('numerator_exc'))) {
-            measureList << SNIPPETS['NONPROP_MEASURE_TPL'])
+            measureList << s.eval(SNIPPETS['NONPROP_MEASURE_TPL'])
           // Proportional Measure
           } else if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
-            measureList << SNIPPETS['PROP_MEASURE_TPL'])
+            measureList << s.eval(SNIPPETS['PROP_MEASURE_TPL'])
           // Standard Single Measure
           } else {
-            measureList << SNIPPETS['SINGLE_MEASURE'])
+            measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
           }
         }
       } else if (measureCategory == 'cost') {
@@ -235,8 +234,6 @@ class ScenarioReader {
   public String toMeasurementSets(List<Scenario> list) {
     def Set msetList = [];
     list.each { s ->
-      def measureCategory = s.data.get('category')
-      def perfYear = s.data.get('perf_year')
       def msetName = s.data.get('mset_id')
       s.data.put('MEASUREMENTS', '${MEASUREMENTS_' + msetName + '}' )
       msetList << s.eval(SNIPPETS['MSET_TEMPLATE'])
