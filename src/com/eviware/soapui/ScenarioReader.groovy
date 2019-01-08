@@ -1,4 +1,4 @@
-package com.eviware.soapui
+package com.eviware.soapui;
 
 /* ScenarioReader
 ** :: Notes ::
@@ -41,14 +41,10 @@ class ScenarioReader {
 
 // cfgSnippets -- A function for configuring all measurement templates to later be used in toMeasurementSets() and toMeasurements()
   public void cfgSnippets() {
-    this.addXSnippet('MSET_TEMPLATE', ' {"programName": "mips","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
-    this.addXSnippet('2018_QUALITY_MSET_TEMPLATE', ' {"programName": "mips","category":"${category}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
+    this.addXSnippet('MSET_TEMPLATE', ' {"programName": "mips","providerId":"${provider_id}","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
     this.addXSnippet('NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc}}}')
-    this.addXSnippet('2018_NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc}}}')
     this.addXSnippet('SINGLE_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total}}}')
-    this.addXSnippet('2018_SINGLE_MEASURE', '{"measureId":"${measure_id}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}", "value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total}}}')
     this.addXSnippet('MULTI_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"strata":[${STRATUM}]}}')
-    this.addXSnippet('2018_MULTI_MEASURE', '{"measureId":"${measure_id}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","value":{"isEndToEndReported":${end_to_end},"strata":[${STRATUM}]}}')
     this.addXSnippet('STRATUM', '{"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total},"stratum":"${stratum}"}')
     this.addXSnippet('ACI_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":${value}}')
     this.addXSnippet('ACI_ALT_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":{"numerator":${value_numerator},"denominator":${value_denominator}}}')
@@ -56,13 +52,9 @@ class ScenarioReader {
     this.addXSnippet('ACR_Idx_COUNTS', '{"code":"${indexAdmissionCode}","count":${count}}')
     this.addXSnippet('ACR_Readd_COUNTS', '{"code":"${readmissionCode}","count":${count}}')
     this.addXSnippet('ACR_MEASURE', '{"measureId":"${measure_id}","value":{"score":${score},"details":{"numberOfIndexAdmissions":${numberOfIndexAdmissions},"numberOfReadmissions":${numberOfReadmissions},"indexReadmissionDiagnosisPairCounts":[${IDX_READD_PAIR_COUNTS}],"indexAdmissionCountByDiagnosis":[${idxAdminCodes}],"readmissionCountByDiagnosis":[${readdCodes}],"plannedReadmissions":${plannedReadmissions}}}}')
-    this.addXSnippet('2018_ACR_MEASURE', '{"measureId":"${measure_id}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","value":{"score":${score},"details":{"numberOfIndexAdmissions":${numberOfIndexAdmissions},"numberOfReadmissions":${numberOfReadmissions},"indexReadmissionDiagnosisPairCounts":[${IDX_READD_PAIR_COUNTS}],"indexAdmissionCountByDiagnosis":[${idxAdminCodes}],"readmissionCountByDiagnosis":[${readdCodes}],"plannedReadmissions":${plannedReadmissions}}}}')
     this.addXSnippet('CAHPS_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"score":${score},"reliability":"${cahps_reliability}","mask":${cahps_mask},"isBelowMinimum":${cahps_isBelowMinimum}}}')
-    this.addXSnippet('2018_CAHPS_MEASURE_TPL', '{"measureId":"${measure_id}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","value":{"score":${score},"reliability":"${cahps_reliability}","mask":${cahps_mask},"isBelowMinimum":${cahps_isBelowMinimum}}}')
     this.addXSnippet('PROP_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"performanceRate":${performanceRate},"eligiblePopulation":${pop_total}}}')
-    this.addXSnippet('2018_PROP_MEASURE_TPL', '{"measureId":"${measure_id}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"performanceRate":${performanceRate},"eligiblePopulation":${pop_total}}}')
     this.addXSnippet('PROP_MULTI_MEASURE_TPL', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceRate":${performanceRate},"strata":[${STRATUM}]}}')
-    this.addXSnippet('2018_PROP_MULTI_MEASURE_TPL', '{"measureId":"${measure_id}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","value":{"isEndToEndReported":${end_to_end},"performanceRate":${performanceRate},"strata":[${STRATUM}]}}')
     this.addXSnippet('COST_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":{"score":${score},"details":{"ratio":${ratio},"eligibleOccurrences":${eligibleOccurrences},"costPerOccurrence":${costPerOccurrence}}}}')
   }
 
@@ -163,7 +155,6 @@ class ScenarioReader {
     def measureList = [];
     list.each { s ->
       def measureCategory = s.data.get('category')
-      def perfYear = s.data.get('perf_year')
       if (s.data.get('mset_id') != msetConstraint) { return; }
       // Begin ACI Measurement Creation
       if (measureCategory == 'aci' || measureCategory == 'pi') {
@@ -197,7 +188,7 @@ class ScenarioReader {
             s.data.put('IDX_READD_PAIR_COUNTS', acrList.join(','))
             s.data.put('idxAdminCodes', indexAdmissionCodes.join(','))
             s.data.put('readdCodes', readmissionCodes.join(','))
-            measureList << s.eval((perfYear == '2018') ? SNIPPETS['2018_ACR_MEASURE'] : SNIPPETS['ACR_MEASURE'])
+            measureList << s.eval(SNIPPETS['ACR_MEASURE'])
           } else {
             // Stratum Measures
             def stratumList = [];
@@ -208,25 +199,25 @@ class ScenarioReader {
             s.data.put('STRATUM', stratumList.join(','))
             // Proportional Stratum Measures
             if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
-              measureList << s.eval((perfYear == '2018') ? SNIPPETS['2018_PROP_MULTI_MEASURE_TPL'] : SNIPPETS['PROP_MULTI_MEASURE_TPL'])
+              measureList << s.eval(SNIPPETS['PROP_MULTI_MEASURE_TPL'])
             // Stratum Measures
             } else {
-              measureList << s.eval((perfYear == '2018') ? SNIPPETS['2018_MULTI_MEASURE'] : SNIPPETS['MULTI_MEASURE'])
+              measureList << s.eval(SNIPPETS['MULTI_MEASURE'])
             }
           }
         } else {
           // CAHPS Measure
           if (!this.isEmptyOrNull(s.data.get('cahps_reliability')) && !this.isEmptyOrNull(s.data.get('cahps_mask')) && !this.isEmptyOrNull(s.data.get('cahps_isBelowMinimum'))) {
-            measureList << s.eval((perfYear == '2018') ? SNIPPETS['2018_CAHPS_MEASURE_TPL'] : SNIPPETS['CAHPS_MEASURE_TPL'])
+            measureList << s.eval(SNIPPETS['CAHPS_MEASURE_TPL'])
           // NonProportional Measure
           } else if (!this.isEmptyOrNull(s.data.get('end_to_end')) && !this.isEmptyOrNull(s.data.get('numerator')) && !this.isEmptyOrNull(s.data.get('denominator')) && !this.isEmptyOrNull(s.data.get('denominator_exc')) && !this.isEmptyOrNull(s.data.get('numerator_exc'))) {
-            measureList << s.eval((perfYear == '2018') ? SNIPPETS['2018_NONPROP_MEASURE_TPL'] : SNIPPETS['NONPROP_MEASURE_TPL'])
+            measureList << s.eval(SNIPPETS['NONPROP_MEASURE_TPL'])
           // Proportional Measure
           } else if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
-            measureList << s.eval((perfYear == '2018') ? SNIPPETS['2018_PROP_MEASURE_TPL'] : SNIPPETS['PROP_MEASURE_TPL'])
+            measureList << s.eval(SNIPPETS['PROP_MEASURE_TPL'])
           // Standard Single Measure
           } else {
-            measureList << s.eval((perfYear == '2018') ? SNIPPETS['2018_SINGLE_MEASURE'] : SNIPPETS['SINGLE_MEASURE'])
+            measureList << s.eval(SNIPPETS['SINGLE_MEASURE'])
           }
         }
       } else if (measureCategory == 'cost') {
@@ -243,15 +234,12 @@ class ScenarioReader {
   public String toMeasurementSets(List<Scenario> list) {
     def Set msetList = [];
     list.each { s ->
-      def measureCategory = s.data.get('category')
-      def perfYear = s.data.get('perf_year')
       def msetName = s.data.get('mset_id')
-      s.data.put('MEASUREMENTS', '${MEASUREMENTS_' + msetName + '}' )
-      if(perfYear == '2018' && measureCategory == 'quality') {
-        msetList << s.eval(SNIPPETS['2018_QUALITY_MSET_TEMPLATE'])
-      } else {
-        msetList << s.eval(SNIPPETS['MSET_TEMPLATE'])
+      if (this.isEmptyOrNull(s.data.get('provider_id'))) {
+        s.data.put('provider_id', '')
       }
+      s.data.put('MEASUREMENTS', '${MEASUREMENTS_' + msetName + '}' )
+      msetList << s.eval(SNIPPETS['MSET_TEMPLATE'])
     }
     return msetList.join(',');
   }
@@ -292,4 +280,7 @@ class ScenarioReader {
     this.currentScenarioList = this.it.next().value;
     copyScenarioProperties(this.propsStep, this.currentScenarioList)
   }
+
+// Make SoapUI Client Happy
+  public void close() { }
 }
