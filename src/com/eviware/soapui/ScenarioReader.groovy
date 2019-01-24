@@ -42,7 +42,8 @@ class ScenarioReader {
 // cfgSnippets -- A function for configuring all measurement templates to later be used in toMeasurementSets() and toMeasurements()
   public void cfgSnippets() {
     this.addXSnippet('MSET_TEMPLATE', ' {"programName": "mips","providerId":"${provider_id}","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
-    this.addXSnippet('NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc},"reportingRate":${reporting_rate}}}')
+    this.addXSnippet('NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc},"reportingRate":${nprop_report_rate}}}')
+    this.addXSnippet('2017_NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc}}}')
     this.addXSnippet('SINGLE_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total}}}')
     this.addXSnippet('MULTI_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"strata":[${STRATUM}]}}')
     this.addXSnippet('STRATUM', '{"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total},"stratum":"${stratum}"}')
@@ -155,6 +156,7 @@ class ScenarioReader {
     def measureList = [];
     list.each { s ->
       def measureCategory = s.data.get('category')
+      def perfYear = s.data.get('perf_year')
       if (s.data.get('mset_id') != msetConstraint) { return; }
       // Begin ACI Measurement Creation
       if (measureCategory == 'aci' || measureCategory == 'pi') {
@@ -211,7 +213,7 @@ class ScenarioReader {
             measureList << s.eval(SNIPPETS['CAHPS_MEASURE_TPL'])
           // NonProportional Measure
           } else if (!this.isEmptyOrNull(s.data.get('end_to_end')) && !this.isEmptyOrNull(s.data.get('numerator')) && !this.isEmptyOrNull(s.data.get('denominator')) && !this.isEmptyOrNull(s.data.get('denominator_exc')) && !this.isEmptyOrNull(s.data.get('numerator_exc'))) {
-            measureList << s.eval(SNIPPETS['NONPROP_MEASURE_TPL'])
+            measureList << s.eval((perfYear == '2017') ? SNIPPETS['2017_NONPROP_MEASURE_TPL'] : SNIPPETS['NONPROP_MEASURE_TPL'])
           // Proportional Measure
           } else if (!this.isEmptyOrNull(s.data.get('performanceRate'))) {
             measureList << s.eval(SNIPPETS['PROP_MEASURE_TPL'])
