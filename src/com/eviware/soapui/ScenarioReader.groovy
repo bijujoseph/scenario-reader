@@ -20,7 +20,6 @@ package com.eviware.soapui;
 ** @param inputFileName  -- Path to input file for data processing
 ** @param outputFileName -- Path to output file for saving results
 */
-
 class ScenarioReader {
   static TEMPLATE_ENGINE = new groovy.text.SimpleTemplateEngine()
   static SNIPPETS = [:]
@@ -39,9 +38,9 @@ class ScenarioReader {
   def propsStep;
   List<Scenario> currentScenarioList;
 
-// cfgSnippets -- A function for configuring all measurement templates to later be used in toMeasurementSets() and toMeasurements()
+  // cfgSnippets -- A function for configuring all measurement templates to later be used in toMeasurementSets() and toMeasurements()
   public void cfgSnippets() {
-    this.addXSnippet('MSET_TEMPLATE', ' {"programName": "mips","providerId":"${provider_id}","cehrtId":"${cehrtId}","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
+    this.addXSnippet('MSET_TEMPLATE', ' {"programName": "${program_name}","providerId": "${provider_id}","practiceId": "${practice_id}","suppressed": "${is_suppressed}","cehrtId":"${cehrtId}","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
     this.addXSnippet('NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc},"reportingRate":${reporting_rate},"performanceRate":${performanceRate}}}')
     this.addXSnippet('2017_NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc}}}')
     this.addXSnippet('SINGLE_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total}}}')
@@ -59,7 +58,7 @@ class ScenarioReader {
     this.addXSnippet('COST_MEASURE_TEMPLATE', '{"measureId":"${measure_id}","value":{"score":${score},"details":{"ratio":${ratio},"eligibleOccurrences":${eligibleOccurrences},"costPerOccurrence":${costPerOccurrence}}}}')
   }
 
-// ScenarioReader -- Class used to initialize all necessary files
+  // ScenarioReader -- Class used to initialize all necessary files
   public ScenarioReader(String folder, String inputFileName, String outputFileName) {
     this.cfgSnippets()
     this.inputFile = new File(folder, inputFileName);
@@ -81,43 +80,44 @@ class ScenarioReader {
     this.it = this.scenarioMap.iterator();
   }
 
-// isEmptyOrNull :: a -> Bool
+  // isEmptyOrNull :: a -> Bool
   public boolean isEmptyOrNull(x) {
     return (x == '' || x == null)
   }
 
-// setPropsStep -- Function for defining SoapUI props within the class to later be manipulated and read by toMeasurementSets() and toMeasurements()
+  // setPropsStep -- Function for defining SoapUI props within the class to later be manipulated and read by toMeasurementSets() and toMeasurements()
   public void setPropsStep(def props) {
     this.propsStep = props;
   }
 
-// addSinglePerformanceMeasureSnippet -- Deprecated legacy function since replaced by addXSnippet() & cfgSnippets()
+  // addSinglePerformanceMeasureSnippet -- Deprecated legacy function since replaced by addXSnippet() & cfgSnippets()
   public void addSinglePerformanceMeasureSnippet(String measureSnippet){
     SNIPPETS.put("SINGLE_MEASURE", TEMPLATE_ENGINE.createTemplate(measureSnippet));
   }
-// addMultiPerformanceMeasureSnippet -- Deprecated legacy function since replaced by addXSnippet() & cfgSnippets()
+
+  // addMultiPerformanceMeasureSnippet -- Deprecated legacy function since replaced by addXSnippet() & cfgSnippets()
   public void addMultiPerformanceMeasureSnippet(String measureSnippet, String stratumSnippet) {
     SNIPPETS.put('MULTI_MEASURE', TEMPLATE_ENGINE.createTemplate(measureSnippet))
     SNIPPETS.put('STRATUM', TEMPLATE_ENGINE.createTemplate(stratumSnippet));
   }
 
-// addMeasurementSetSnippet -- Deprecated legacy function since replaced by addXSnippet() & cfgSnippets()
+  // addMeasurementSetSnippet -- Deprecated legacy function since replaced by addXSnippet() & cfgSnippets()
   public void addMeasurementSetSnippet(String msetSnippet) {
     SNIPPETS.put('MSET_TEMPLATE', TEMPLATE_ENGINE.createTemplate(msetSnippet));
   }
 
-/* addXSnippet -- A function for creating snippets or templates. Primarily used to set templates for measurements or basic JSON structures for API calls.
-** -- Note --
-** In the newSnippet string, values wrapped in ${} are replaced by the corresponding PROP name either defined in code or the column name in the TSV.
-**
-** @param name       :: String -- ex. "MEASUREMENT_TEMPLATE"
-** @param newSnippet :: String -- ex. '{ "name": ${MEASURE_NAME}, "value": ${MEASURE_VALUE}}'
-*/
+  /* addXSnippet -- A function for creating snippets or templates. Primarily used to set templates for measurements or basic JSON structures for API calls.
+  ** -- Note --
+  ** In the newSnippet string, values wrapped in ${} are replaced by the corresponding PROP name either defined in code or the column name in the TSV.
+  **
+  ** @param name       :: String -- ex. "MEASUREMENT_TEMPLATE"
+  ** @param newSnippet :: String -- ex. '{ "name": ${MEASURE_NAME}, "value": ${MEASURE_VALUE}}'
+  */
   public void addXSnippet(String name, String newSnippet) {
     SNIPPETS.put(name, TEMPLATE_ENGINE.createTemplate(newSnippet));
   }
 
-// addScenario -- Add Scenario classes to scenarioMap variable. Assigns Scenarios to the Scenario.children array if there are duplicate MeasurementIDs in the case of Stratum
+  // addScenario -- Add Scenario classes to scenarioMap variable. Assigns Scenarios to the Scenario.children array if there are duplicate MeasurementIDs in the case of Stratum
   private void addScenario(Scenario s) {
     if (scenarioMap.containsKey(s.scenarioId)) {
       List<Scenario> scenarios = scenarioMap[s.scenarioId];
@@ -132,12 +132,12 @@ class ScenarioReader {
     }
   }
 
-// getHeader :: [ String ]
+  // getHeader :: [ String ]
   public String[] getHeader() {
     this.header;
   }
 
-// Convert TSV row into Scenario class and groups them based on the `scenario_id` column
+  // Convert TSV row into Scenario class and groups them based on the `scenario_id` column
   private Scenario toScenario(String line) {
     String[] parts = line.split("\t");
     def data = [:]
@@ -147,11 +147,12 @@ class ScenarioReader {
     return new Scenario(this.header, data[scenarioId], data);
   }
 
-/* toMeasurements -- Receives an array of Scenarios and the value under `mset_id` to set Props specific for generating measurements in the proper measurementSet in the Submissions Obj for `score-preview`
-**
-** @param list           :: [Scenario]
-** @param msetConstraint :: String
-*/
+  /* toMeasurements -- Receives an array of Scenarios and the value under `mset_id`
+  ** to set Props specific for generating measurements in the proper measurementSet in the Submissions Obj for `score-preview`
+  **
+  ** @param list           :: [Scenario]
+  ** @param msetConstraint :: String
+  */
   public String toMeasurements(List<Scenario> list, String msetConstraint) {
     def measureList = [];
     list.each { s ->
@@ -232,13 +233,22 @@ class ScenarioReader {
     return measureList.join(',');
   }
 
-// toMeasurementSets -- Responsible for creating Props for multiple measurementSets defined by the `mset_id` column.
+  // toMeasurementSets -- Responsible for creating Props for multiple measurementSets defined by the `mset_id` column.
   public String toMeasurementSets(List<Scenario> list) {
     def Set msetList = [];
     list.each { s ->
       def msetName = s.data.get('mset_id')
       if (this.isEmptyOrNull(s.data.get('provider_id'))) {
         s.data.put('provider_id', '')
+      }
+      if (this.isEmptyOrNull(s.data.get('program_name'))) {
+        s.data.put('program_name', 'mips')
+      }
+      if (this.isEmptyOrNull(s.data.get('is_suppressed'))) {
+        s.data.put('is_suppressed', 'false')
+      }
+      if (this.isEmptyOrNull(s.data.get('practice_id'))) {
+        s.data.put('practice_id', '')
       }
       if (this.isEmptyOrNull(s.data.get('cehrtId'))) {
         s.data.put('cehrtId', '')
@@ -249,7 +259,7 @@ class ScenarioReader {
     return msetList.join(',');
   }
 
-// copyScenarioProperties -- Responsible for creating and updating all Props in the `prop` test step.
+  // copyScenarioProperties -- Responsible for creating and updating all Props in the `prop` test step.
   public String copyScenarioProperties(def propsStep, List<Scenario> scenarios) {
     if (scenarios.size() > 0) {
       def last = scenarios.last();
@@ -268,24 +278,24 @@ class ScenarioReader {
     }
   }
 
-// writeScenarioStatus -- Writes results of test scenarios to the assigned output file.
+  // writeScenarioStatus -- Writes results of test scenarios to the assigned output file.
   public void writeScenarioStatus(String status, List<Scenario> scenarios) {
     scenarios.each {s ->
       outputFile << s.toLine(status)
     }
   }
 
-// Checks iterator defined in ScenarioReader to see if the end of the TSV has been met.
+  // Checks iterator defined in ScenarioReader to see if the end of the TSV has been met.
   public boolean hasNext() {
     this.it.hasNext();
   }
 
-// Prepares next set of scenarios grouped by `scenario_id`, configures props, and sets the stage for the test steps to be run again.
+  // Prepares next set of scenarios grouped by `scenario_id`, configures props, and sets the stage for the test steps to be run again.
   public void next() {
     this.currentScenarioList = this.it.next().value;
     copyScenarioProperties(this.propsStep, this.currentScenarioList)
   }
 
-// Make SoapUI Client Happy
+  // Make SoapUI Client Happy
   public void close() { }
 }
