@@ -40,7 +40,7 @@ class ScenarioReader {
 
   // cfgSnippets -- A function for configuring all measurement templates to later be used in toMeasurementSets() and toMeasurements()
   public void cfgSnippets() {
-    this.addXSnippet('MSET_TEMPLATE', ' {"programName": "${program_name}","providerId": "${provider_id}","practiceId": "${practice_id}","suppressed": "${is_suppressed}","cehrtId":"${cehrtId}","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
+    this.addXSnippet('MSET_TEMPLATE', ' {"programName": "${program_name}","providerId": "${provider_id}","practiceId": "${practice_id}","suppressed": ${is_suppressed},"cehrtId":"${cehrtId}","category":"${category}","performanceStart":"${perf_start}","performanceEnd":"${perf_end}","submissionMethod": "${sub_method}","measurements":[${MEASUREMENTS}]}')
     this.addXSnippet('NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc},"reportingRate":${reporting_rate},"performanceRate":${performanceRate}}}')
     this.addXSnippet('2017_NONPROP_MEASURE_TPL', '{"measureId": "${measure_id}","value": {"isEndToEndReported": ${end_to_end},"numerator": ${numerator},"denominator": ${denominator},"denominatorException": ${denominator_exc},"numeratorExclusion":${numerator_exc}}}')
     this.addXSnippet('SINGLE_MEASURE', '{"measureId":"${measure_id}","value":{"isEndToEndReported":${end_to_end},"performanceMet":${perf_met},"eligiblePopulationException":${perf_excep},"eligiblePopulationExclusion":${perf_exclu},"performanceNotMet":${perf_not_met},"eligiblePopulation":${pop_total}}}')
@@ -249,7 +249,7 @@ class ScenarioReader {
         s.data.put('program_name', 'mips')
       }
       if (this.isEmptyOrNull(s.data.get('is_suppressed'))) {
-        s.data.put('is_suppressed', 'false')
+        s.data.put('is_suppressed', false)
       }
       if (this.isEmptyOrNull(s.data.get('practice_id'))) {
         s.data.put('practice_id', '')
