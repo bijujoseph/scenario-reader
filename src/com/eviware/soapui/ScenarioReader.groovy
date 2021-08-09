@@ -183,15 +183,19 @@ class ScenarioReader {
             def Set acrList = [];
             def Set indexAdmissionCodes = [];
             def Set readmissionCodes = [];
-            s.children.each { c->
-              acrList << s.eval(SNIPPETS['IDX_READD_PAIR_COUNTS']);
-              indexAdmissionCodes << s.eval(SNIPPETS['ACR_Idx_COUNTS']);
-              readmissionCodes << s.eval(SNIPPETS['ACR_Readd_COUNTS']);
+            if (s.data.get('measureId') == 'MCC1') {
+              measureList << s.eval(SNIPPETS['PROP_MULTI_MEASURE_TPL'])
+            } else {
+              s.children.each { c->
+                acrList << s.eval(SNIPPETS['IDX_READD_PAIR_COUNTS']);
+                indexAdmissionCodes << s.eval(SNIPPETS['ACR_Idx_COUNTS']);
+                readmissionCodes << s.eval(SNIPPETS['ACR_Readd_COUNTS']);
+              }
+              s.data.put('IDX_READD_PAIR_COUNTS', acrList.join(','))
+              s.data.put('idxAdminCodes', indexAdmissionCodes.join(','))
+              s.data.put('readdCodes', readmissionCodes.join(','))
+              measureList << s.eval(SNIPPETS['ACR_MEASURE'])
             }
-            s.data.put('IDX_READD_PAIR_COUNTS', acrList.join(','))
-            s.data.put('idxAdminCodes', indexAdmissionCodes.join(','))
-            s.data.put('readdCodes', readmissionCodes.join(','))
-            measureList << s.eval(SNIPPETS['ACR_MEASURE'])
           } else {
             // Stratum Measures
             def stratumList = [];
