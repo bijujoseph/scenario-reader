@@ -268,7 +268,7 @@ class ScenarioReader {
     return msetList.join(',');
   }
   
-  // toMeasurementSets -- Responsible for creating Props for multiple measurementSets defined by the `mset_id` column.
+  // toBenchmark -- Responsible for concatenating scenario level benchmark injection (i.e. from TSV level)
   public String toBenchmark(List<Scenario> list) {
     def benchmarkList = [];
     def jsonSlurper = new JsonSlurper();
