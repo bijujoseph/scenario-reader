@@ -1,5 +1,8 @@
 package com.eviware.soapui;
 
+import groovy.json.JsonSlurper;
+import groovy.json.JsonOutput;
+
 /* ScenarioReader
 ** :: Notes ::
 ** ScenarioReader is a class for processing .TSV files within the SoapUI framework and converting each row or group of rows into JSON to be saved as properties in the "prop" file of the corresponding scenario.
@@ -24,6 +27,7 @@ class ScenarioReader {
   static TEMPLATE_ENGINE = new groovy.text.SimpleTemplateEngine()
   static SNIPPETS = [:]
 
+  private String projectFolderPath;
   private File inputFile;
   private File outputFile;
   private BufferedReader reader;
@@ -60,7 +64,8 @@ class ScenarioReader {
 
   // ScenarioReader -- Class used to initialize all necessary files
   public ScenarioReader(String folder, String inputFileName, String outputFileName) {
-    this.cfgSnippets()
+    this.cfgSnippets();
+    this.projectFolderPath = folder;
     this.inputFile = new File(folder, inputFileName);
     this.outputFile = new File(folder, outputFileName);
     inputFile.eachLine {line, i ->
@@ -262,6 +267,22 @@ class ScenarioReader {
     }
     return msetList.join(',');
   }
+  
+  // toBenchmark -- Responsible for concatenating scenario level benchmark injection (i.e. from TSV level)
+  public String toBenchmark(List<Scenario> list) {
+    def benchmarkList = [];
+    def jsonSlurper = new JsonSlurper();
+    list.each { s ->
+      if (!this.isEmptyOrNull(s.data.get('benchmarkJson'))) {
+      	String osName = System.properties['os.name'];
+        boolean isWindows = osName.toLowerCase().contains('windows');
+      	String jsonFileName = isWindows ? s.data.get('benchmarkJson').replace("/", "\\") : s.data.get('benchmarkJson').replace("\\", "/");
+        File benchmarkJson = new File(this.projectFolderPath, s.data.get('benchmarkJson'));
+        benchmarkList.addAll(jsonSlurper.parse(benchmarkJson));
+      }
+    }
+    return JsonOutput.toJson(benchmarkList);
+  }
 
   // copyScenarioProperties -- Responsible for creating and updating all Props in the `prop` test step.
   public String copyScenarioProperties(def propsStep, List<Scenario> scenarios) {
@@ -271,6 +292,7 @@ class ScenarioReader {
         propsStep.setPropertyValue(k, v);
       }
       propsStep.setPropertyValue('MSETS', this.toMeasurementSets(scenarios))
+      propsStep.setPropertyValue('BENCHMARKS', this.toBenchmark(scenarios))
 
       def Set mSetsMeasurementProps = [];
       scenarios.each { s ->
