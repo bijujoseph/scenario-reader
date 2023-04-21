@@ -1,6 +1,6 @@
 package com.eviware.soapui;
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.Logger
 import com.eviware.soapui.impl.wsdl.teststeps.*
 import com.eviware.soapui.support.types.StringToStringMap
 import com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase

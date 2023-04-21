@@ -4,7 +4,6 @@ import com.eviware.soapui.model.testsuite.*;
 import com.eviware.soapui.report.DataDrivenJUnitReport;
 import com.eviware.soapui.report.JUnitReport;
 import com.eviware.soapui.report.JUnitSecurityReportCollector;
-import org.apache.commons.lang.StringUtils;
 import com.eviware.soapui.support.xml.XmlUtils;
 
 import java.io.File;
@@ -30,7 +29,7 @@ public class DataDrivenJUnitReportCollector extends JUnitSecurityReportCollector
     public DataDrivenJUnitReportCollector() {
 
         String key = System.getenv().get("scenario_id");
-        if (StringUtils.isNotEmpty(key)) {
+        if ( key != null && !key.trim().isEmpty()) {
             TEST_SCENARIO_KEY = key;
         }
     }
@@ -56,7 +55,7 @@ public class DataDrivenJUnitReportCollector extends JUnitSecurityReportCollector
         while (keyset.hasNext()) {
             String name = keyset.next();
             JUnitReport report = getReports().get(name);
-            String fileName = path + File.separatorChar + "TEST-" + StringUtils.replace(name, " " , "_") + ".xml";
+            String fileName = path + File.separatorChar + "TEST-" + name.replace(" ", "_") + ".xml";
             saveReport(report, fileName);
             result.add(fileName);
         }

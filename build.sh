@@ -1,7 +1,7 @@
 #!/bin/bash
 cd ./src/com/eviware/soapui && \
 # Compiling Groovy Files
-groovyc -cp /Applications/SoapUI-5.4.0.app/Contents/java/app/bin/soapui-5.4.0.jar:/Applications/SoapUI-5.4.0.app/Contents/java/app/lib/log4j-1.2.14.jar *.groovy && \
+groovyc -cp /Applications/SoapUI-5.7.0.app/Contents/java/app/bin/soapui-5.7.0.jar:/Applications/SoapUI-5.7.0.app/Contents/java/app/lib/log4j-api-2.17.1.jar *.groovy && \
 mkdir ./src/ && \
 mv ./com/ ./src/ && \
 # Moving Java and their class files to be packaged

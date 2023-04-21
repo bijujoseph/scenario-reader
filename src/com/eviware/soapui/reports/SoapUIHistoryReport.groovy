@@ -17,7 +17,7 @@ import com.eviware.soapui.impl.wsdl.testcase.WsdlTestCaseRunner
 
 import groovy.json.JsonOutput
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger
 
 class SoapUIHistoryReport {
 
